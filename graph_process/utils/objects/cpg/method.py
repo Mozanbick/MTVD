@@ -10,11 +10,12 @@ class Method:
     A class for methods' structure
     """
 
-    def __init__(self, entry: int, ret: int, testID: str, name: str, node_list: List[Node], edge_list: List[Edge]):
+    def __init__(self, entry: int, ret: int, testID: str, code: str, name: str, node_list: List[Node], edge_list: List[Edge]):
         self._entry = entry
         self._ret = ret
         self._name = name
         self._testID = testID
+        self._code = code
         self.nodes: Dict[int, Node] = {node.id: node for node in node_list}
         self.edges = edge_list
         self.ast_edges: Dict[int, Set] = {}
@@ -26,6 +27,7 @@ class Method:
         self._func_calls: Dict[str, List] = {}
         self.nodes_in_line: Dict[int, List] = {}
         self.use_line_to_def_line: Dict[str, Set] = {}
+        self._label = int(testID.split('_')[-1])
         self.init_graph()
         # modify v2
         # no need

@@ -15,8 +15,9 @@ class Cpg:
     A class for the cpg structure
     Contains: nodes: Dict[int, Node], methods: Dict[str, Method]
     """
-    def __init__(self, cpg_path):
+    def __init__(self, cpg_path, src_path=None):
         self.cpg_path = cpg_path
+        self.src_path = src_path
         self.nodes: Dict[int, Node] = {}
         self.methods: Dict[str, List[Method]] = {}
         self._parse_from_files()
@@ -42,11 +43,13 @@ class Cpg:
             method_files = listdir(method_dir)
             for method_file in tqdm(method_files, desc="Loading function cpgs"):
                 file = join(method_dir, method_file)
-                testID = method_file.split("@@")[0]
+                with open(join(self.src_path, method_file.replace('.txt', '.cpp')), 'r') as fp:
+                    code = fp.read()
+                testID = method_file.split(".txt")[0]
                 with open(file, "r", encoding="utf-8") as fp:
                     cpg = fp.readlines()
                     try:
-                        self._parse_cpg(cpg, testID)
+                        self._parse_cpg(cpg, testID, code)
                     except (KeyError, IndexError):
                         continue
         else:
@@ -62,7 +65,7 @@ class Cpg:
             node = Node(n)
             self.nodes[node.id] = node
 
-    def _parse_cpg(self, cpg: List[str], testID: str):
+    def _parse_cpg(self, cpg: List[str], testID: str, code: str):
         """
         Parse cpg information into Method class format.
         Cpg format:
@@ -125,7 +128,7 @@ class Cpg:
                 node_out = int(node_out)
                 method_edges.append(Edge(node_in, node_out, label))
 
-        method = Method(method_entry, method_nodes[-1].id, testID, self.nodes[method_entry].name, method_nodes, method_edges)
+        method = Method(method_entry, method_nodes[-1].id, testID, code, self.nodes[method_entry].name, method_nodes, method_edges)
         if testID in self.methods:
             self.methods[testID].append(method)
         else:

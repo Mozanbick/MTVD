@@ -100,12 +100,17 @@ def arg_parse():
         dest='dataset_dir',
         help='Directory to save input dataset'
     )
+    parser.add_argument(
+        '--ft-dir',
+        dest='ft_dir',
+        help='Directory to save input dataset'
+    )
 
     parser.set_defaults(
-        dataset='cfan',
+        dataset='BigVul',
         group='group0',
         func_level=False,
-        nodes_dim=205,
+        nodes_dim=505,
         embed_dim=100,
         vul_ratio=1,
         spgs_dir="./joern/repository/",
@@ -118,7 +123,8 @@ def arg_parse():
         label_path="",
         corpus_dir="./input/corpus/",
         w2v_dir="./input/w2v/",
-        dataset_dir="./input/dataset/"
+        dataset_dir="./input/dataset/",
+        ft_dir="../ft_dataset/"
     )
 
     return parser.parse_args()
@@ -155,13 +161,14 @@ def main():
     else:
         suffix = ''
     if 'train' in group:
-        save_dir = join(args.dataset_dir, modelConfig.dataset, "train")
+        save_dir = join(args.ft_dir, modelConfig.dataset, "train")
     elif 'test' in group:
-        save_dir = join(args.dataset_dir, modelConfig.dataset, "test")
+        save_dir = join(args.ft_dir, modelConfig.dataset, "test")
     else:
-        save_dir = join(args.dataset_dir, modelConfig.dataset + suffix)
+        save_dir = join(args.ft_dir, modelConfig.dataset, "valid")
     points_file = f"./joern/joern-cli/results_{modelConfig.dataset}/{group}/AllVulPoints.txt"
     cpg_path = f"./joern/joern-cli/results_{modelConfig.dataset}/{group}"
+    src_path = f"./input/dataset/{modelConfig.dataset}/{group}"
     if args.label_path != "":
         label_path = args.label_path
     else:
@@ -180,7 +187,7 @@ def main():
     corpus_path = join(args.corpus_dir, modelConfig.dataset)
     w2v_path = join(args.w2v_dir, f"w2v_model_{modelConfig.dataset}.model")
     start_time = time.time()
-    cpg = Cpg(cpg_path)
+    cpg = Cpg(cpg_path, src_path)
     # preprocessing procedure
     graph_to_dataset_new(cpg, points_file, label_path, corpus_path, w2v_path, save_dir, args)
     end_time = time.time()
