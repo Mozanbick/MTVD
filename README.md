@@ -13,13 +13,14 @@ python run.py \
     --tokenizer_name=microsoft/codebert-base \
     --model_name_or_path=microsoft/codebert-base \
     --do_train \
+    --do_eval \
     --train_data_file=dataset/BigVul/train.jsonl \
     --eval_data_file=dataset/BigVul/valid.jsonl \
     --test_data_file=dataset/BigVul/test.jsonl \
     --epoch 5 \
     --block_size 512 \
-    --train_batch_size 32 \
-    --eval_batch_size 64 \
+    --train_batch_size 8 \
+    --eval_batch_size 8 \
     --learning_rate 2e-5 \
     --max_grad_norm 1.0 \
     --evaluate_during_training \
@@ -34,7 +35,6 @@ python run.py \
     --model_type=roberta \
     --tokenizer_name=microsoft/codebert-base \
     --model_name_or_path=microsoft/codebert-base \
-    --do_eval \
     --do_test \
     --train_data_file=dataset/BigVul/train.jsonl \
     --eval_data_file=dataset/BigVul/valid.jsonl \
@@ -66,17 +66,17 @@ vul_ratio=1,  # 漏洞:良性 样本分割比例
 spgs_dir="./joern/repository/",
 fpgs_dir="./joern/repository/",  # 图保存目录
 ast_attr_path="./joern/files/our_map_all.txt",
-gen_graph=False,  # 从头生成属性图，True 表示进行生成
+gen_graph=True,  # 从头生成属性图，True 表示进行生成
 with_load=False,  # 从目录加载属性图
 gen_w2v=False,  # 根据数据集样本生成词嵌入
-g2dataset=False,  # 将属性图生成图数据集
+g2dataset=True,  # 将属性图生成图数据集
 label_path="",
 corpus_dir="./input/corpus/",
 w2v_dir="./input/w2v/",
-dataset_dir="./input/dataset/"  # 数据集原始路径
+dataset_dir="./input/dataset/",  # 数据集原始路径
+ft_dir="../ft_dataset/"  # 生成的微调数据保存路径
 ```
-由于这里我们只需要得到属性图，所以只需打开 `gen_graph` 选项即可。
-由属性图生成依赖预测、补丁预测子任务数据集的操作交由 `/dataset/data_preprocess.py` 完成。
+由于这里我们只需要得到属性图，并由属性图生成漏洞预测、依赖预测、补丁预测子任务数据集，所以只需打开 `gen_graph` 选项和 `g2dataset` 选项即可，其他选项可按照默认选项设置。
 
 ### 系统运行
 
